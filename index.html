@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truchet Tile Variations — P1</title>
+<style>
+  :root {
+    --bg: #f5f0eb;
+    --fg: #1a1a1a;
+    --accent: #c8a96e;
+    --panel-bg: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.04em;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  button {
+    padding: 0.5rem 1.2rem;
+    border: 1px solid #ccc;
+    background: var(--panel-bg);
+    color: var(--fg);
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+
+  .color-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.82rem;
+  }
+  .color-controls label { display: flex; align-items: center; gap: 0.4rem; }
+  .color-controls input[type="color"] {
+    width: 28px; height: 28px; border: 1px solid #ccc; cursor: pointer;
+    padding: 0; background: none;
+  }
+
+  .grid-container {
+    background: var(--panel-bg);
+    padding: 1.5rem;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    display: inline-block;
+    line-height: 0;
+  }
+  svg#tiling {
+    display: block;
+    max-width: 90vw;
+    max-height: 75vh;
+  }
+
+  .tile-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+  .tile-preview-label {
+    font-size: 0.75rem;
+    color: #888;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .tile-thumb {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+    background: var(--panel-bg);
+    padding: 4px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tile-thumb:hover { border-color: var(--accent); }
+  .tile-thumb.active { border-color: var(--fg); box-shadow: 0 0 0 1px var(--fg); }
+  .tile-thumb svg { width: 100%; height: 100%; display: block; }
+  .tile-thumb-deg {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: #aaa;
+  }
+
+  .info {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: #aaa;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 1.2rem; }
+    .controls { gap: 0.35rem; }
+    button { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Truchet Tile — P1</h1>
+<p class="subtitle" id="subtitle">12 × 12 Tiling Variations</p>
+
+<div class="controls" id="controls">
+  <button data-pattern="random" class="active">Random</button>
+  <button data-pattern="diagonal">Diagonal</button>
+  <button data-pattern="diamond">Diamond</button>
+  <button data-pattern="spiral">Spiral</button>
+  <button data-pattern="checker">Checkerboard</button>
+  <button data-pattern="columns">Columns</button>
+  <button data-pattern="rows">Rows</button>
+  <button data-pattern="zigzag">Zigzag</button>
+  <button data-pattern="pinwheel">Pinwheel</button>
+  <button data-pattern="maze">Maze</button>
+  <button data-pattern="wave">Wave</button>
+  <button data-pattern="radial">Radial</button>
+</div>
+
+<div class="tile-preview" id="tilePreview">
+  <span class="tile-preview-label">Tile</span>
+  <div class="tile-thumb" data-rot="0" title="0°"><svg id="thumb0" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">0°</span></div>
+  <div class="tile-thumb" data-rot="1" title="90°"><svg id="thumb1" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">90°</span></div>
+  <div class="tile-thumb" data-rot="2" title="180°"><svg id="thumb2" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">180°</span></div>
+  <div class="tile-thumb" data-rot="3" title="270°"><svg id="thumb3" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">270°</span></div>
+</div>
+
+<div class="color-controls">
+  <label>Grid: <input type="range" id="gridSize" min="2" max="32" value="12" style="width:100px;vertical-align:middle"> <span id="gridLabel">12×12</span></label>
+  <label>Fill: <input type="color" id="fillColor" value="#000000"></label>
+  <label>Background: <input type="color" id="bgColor" value="#ffffff"></label>
+  <button id="invertBtn" style="padding:0.35rem 0.8rem">Invert</button>
+  <button id="downloadBtn" style="padding:0.35rem 0.8rem">↓ SVG</button>
+  <label id="uploadLabel" style="padding:0.35rem 0.8rem;border:1px solid #ccc;background:var(--panel-bg);font-size:0.82rem;cursor:pointer;border-radius:2px;transition:all 0.2s">↑ Upload SVG<input type="file" id="svgUpload" accept=".svg" style="display:none"></label>
+</div>
+
+<div class="grid-container" id="gridContainer">
+  <svg id="tiling" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<p class="info" id="info">Click "Random" again to regenerate</p>
+
+<script>
+let GRID = 12;
+const TILE_SIZE = 50; // each tile cell in SVG units
+const SVG_NS = "http://www.w3.org/2000/svg";
+const ORIG = 192.756; // original tile size
+
+let currentPattern = 'random';
+let currentRotations = [];
+let fillColor = '#000000';
+let bgColor = '#ffffff';
+
+// Default tile SVG content (P1 Truchet) — viewBox and inner paths
+let tileViewBox = `0 0 192.756 192.756`;
+let tileInnerSVG = `
+  <path d="m 0,0 v 72.115 0.166 h 24.093 c 0,-13.28 10.81,-24.09 24.1,-24.09 V 24.284 24.091 c -13.29,0 -24.1,-10.8 -24.1,-24.09 0,-13.29 10.81,-24.09 24.1,-24.09 v -0.182 -23.807 -0.111 c -12.22,0 -23.38,4.55 -31.87,12.05 -10.01,8.82 -16.32,21.75 -16.32,36.14"
+    style="fill-rule:nonzero;stroke:none"
+    transform="matrix(1.3333333,0,0,-1.3333333,128.50053,96.379333)" />
+  <path d="m 0,0 v 72.115 0.166 h -24.093 c 0,-13.28 -10.81,-24.09 -24.1,-24.09 V 24.284 24.091 c 13.29,0 24.1,-10.8 24.1,-24.09 0,-13.29 -10.81,-24.09 -24.1,-24.09 v -0.182 -23.807 -0.111 c 12.22,0 23.38,4.55 31.87,12.05 10.01,8.82 16.32,21.75 16.32,36.14"
+    style="fill-rule:nonzero;stroke:none"
+    transform="matrix(1.3333333,0,0,-1.3333333,64.255467,96.379333)" />
+  <path d="m 0,0 c 0,13.28 10.81,24.09 24.09,24.09 13.29,0 24.1,-10.81 24.1,-24.09 h 24.09 c 0,12.22 -4.55,23.38 -12.04,31.87 C 51.4,41.87 38.49,48.18 24.09,48.18 9.7,48.18 -3.22,41.87 -12.05,31.87 -19.55,23.38 -24.1,12.22 -24.1,0 Z"
+    style="fill-rule:nonzero;stroke:none"
+    transform="matrix(1.3333333,0,0,-1.3333333,64.251333,192.75133)" />`;
+
+// Pattern generators — each returns a 12x12 array of rotations (0, 1, 2, 3 = 0°, 90°, 180°, 270°)
+const patterns = {
+  random: () => Array.from({length: GRID}, () => Array.from({length: GRID}, () => Math.floor(Math.random() * 4))),
+
+  diagonal: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => (r + c) % 4)),
+
+  diamond: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => {
+    const dr = Math.abs(r - 5.5), dc = Math.abs(c - 5.5);
+    return Math.floor(dr + dc) % 4;
+  })),
+
+  spiral: () => {
+    const grid = Array.from({length: GRID}, () => Array(GRID).fill(0));
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        const angle = Math.atan2(r - 5.5, c - 5.5);
+        const dist = Math.sqrt((r - 5.5) ** 2 + (c - 5.5) ** 2);
+        grid[r][c] = Math.floor((angle / Math.PI * 2 + dist * 0.5 + 4) * 2) % 4;
+      }
+    }
+    return grid;
+  },
+
+  checker: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => ((r + c) % 2) * 2)),
+
+  columns: () => Array.from({length: GRID}, () => Array.from({length: GRID}, (_, c) => c % 4)),
+
+  rows: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, () => r % 4)),
+
+  zigzag: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => {
+    return r % 2 === 0 ? c % 2 : (c % 2 === 0 ? 2 : 3);
+  })),
+
+  pinwheel: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => {
+    const qr = r < 6 ? 0 : 1;
+    const qc = c < 6 ? 0 : 1;
+    return (qr * 2 + qc);
+  })),
+
+  maze: () => {
+    // Generates a maze-like pattern using alternating orientations
+    const grid = Array.from({length: GRID}, () => Array(GRID).fill(0));
+    for (let r = 0; r < GRID; r++) {
+      for (let c = 0; c < GRID; c++) {
+        // Create connected-looking paths
+        const hash = Math.sin(r * 127.1 + c * 311.7) * 43758.5453;
+        grid[r][c] = (Math.floor(Math.abs(hash)) % 2) * 2 + (r % 2);
+      }
+    }
+    return grid;
+  },
+
+  wave: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => {
+    const wave = Math.sin(c * 0.8 + r * 0.3) * 2;
+    return ((Math.floor(wave) % 4) + 4) % 4;
+  })),
+
+  radial: () => Array.from({length: GRID}, (_, r) => Array.from({length: GRID}, (_, c) => {
+    const angle = Math.atan2(r - 5.5, c - 5.5);
+    return ((Math.floor(angle / (Math.PI / 2)) % 4) + 4) % 4;
+  })),
+};
+
+function renderThumbs() {
+  // Render all thumbs at 0° with clipping, then CSS-rotate the whole element.
+  // This ensures the tile is clipped to its boundary first, then rotated as a unit
+  // (matching how the grid renders via <symbol overflow="hidden"> + <use transform>).
+  for (let i = 0; i < 4; i++) {
+    const svg = document.getElementById(`thumb${i}`);
+    const angle = i * 90;
+    svg.setAttribute('viewBox', tileViewBox);
+    svg.style.overflow = 'hidden';
+    svg.style.transform = `rotate(${angle}deg)`;
+    svg.innerHTML = `<g fill="${fillColor}">${tileInnerSVG}</g>`;
+  }
+}
+
+function render() {
+  const svg = document.getElementById('tiling');
+  const totalSize = GRID * TILE_SIZE;
+  svg.setAttribute('width', totalSize);
+  svg.setAttribute('height', totalSize);
+  svg.setAttribute('viewBox', `0 0 ${totalSize} ${totalSize}`);
+
+  // Use a <symbol> with the original viewBox — the browser handles scaling via width/height on <use>
+  // Add a clipPath inside the symbol to clip to tile boundary (replacing the original clip-paths)
+  let html = `<rect width="${totalSize}" height="${totalSize}" fill="${bgColor}"/>`;
+  html += `<defs>
+    <symbol id="tile" viewBox="${tileViewBox}" overflow="hidden">
+      ${tileInnerSVG}
+    </symbol>
+  </defs>`;
+
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c < GRID; c++) {
+      const rot = currentRotations[r][c];
+      const x = c * TILE_SIZE;
+      const y = r * TILE_SIZE;
+      const cx = x + TILE_SIZE / 2;
+      const cy = y + TILE_SIZE / 2;
+      const angle = rot * 90;
+      html += `<use href="#tile" x="${x}" y="${y}" width="${TILE_SIZE}" height="${TILE_SIZE}"
+        transform="rotate(${angle} ${cx} ${cy})" fill="${fillColor}" />`;
+    }
+  }
+
+  svg.innerHTML = html;
+}
+
+function setPattern(name) {
+  currentPattern = name;
+  currentRotations = patterns[name]();
+  render();
+  renderThumbs();
+
+  document.querySelectorAll('.controls button').forEach(b => {
+    b.classList.toggle('active', b.dataset.pattern === name);
+  });
+
+  document.getElementById('info').textContent =
+    name === 'random' ? 'Click "Random" again to regenerate' : `Pattern: ${name}`;
+}
+
+// Event listeners
+document.getElementById('controls').addEventListener('click', e => {
+  if (e.target.dataset.pattern) setPattern(e.target.dataset.pattern);
+});
+
+document.getElementById('fillColor').addEventListener('input', e => {
+  fillColor = e.target.value;
+  render();
+  renderThumbs();
+});
+
+document.getElementById('bgColor').addEventListener('input', e => {
+  bgColor = e.target.value;
+  document.getElementById('gridContainer').style.background = bgColor;
+  render();
+});
+
+document.getElementById('invertBtn').addEventListener('click', () => {
+  const tmp = fillColor;
+  fillColor = bgColor;
+  bgColor = tmp;
+  document.getElementById('fillColor').value = fillColor;
+  document.getElementById('bgColor').value = bgColor;
+  document.getElementById('gridContainer').style.background = bgColor;
+  render();
+  renderThumbs();
+});
+
+document.getElementById('gridSize').addEventListener('input', e => {
+  GRID = parseInt(e.target.value);
+  document.getElementById('gridLabel').textContent = `${GRID}×${GRID}`;
+  document.getElementById('subtitle').textContent = `${GRID} × ${GRID} Tiling Variations`;
+  setPattern(currentPattern);
+});
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const svg = document.getElementById('tiling');
+  const serializer = new XMLSerializer();
+  let source = serializer.serializeToString(svg);
+  source = '<?xml version="1.0" encoding="UTF-8"?>\n' + source;
+  const blob = new Blob([source], {type: 'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `truchet_P1_${currentPattern}_${GRID}x${GRID}.svg`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('svgUpload').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const text = ev.target.result;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    if (!svg) { alert('No valid SVG found'); return; }
+
+    // Extract viewBox or width/height
+    let vb = svg.getAttribute('viewBox');
+    if (!vb) {
+      const w = parseFloat(svg.getAttribute('width')) || 100;
+      const h = parseFloat(svg.getAttribute('height')) || 100;
+      vb = `0 0 ${w} ${h}`;
+    }
+    tileViewBox = vb;
+
+    // Extract all child elements as inner SVG (skip defs with color-profiles, keep paths/groups)
+    // Clone all children into a temp container
+    let inner = '';
+    for (const child of svg.children) {
+      const tag = child.tagName.toLowerCase();
+      if (tag === 'sodipodi:namedview' || tag === 'metadata') continue;
+      // Include defs only if they contain clipPaths/gradients (not color-profiles)
+      inner += child.outerHTML;
+    }
+    tileInnerSVG = inner;
+
+    // Update title
+    const name = file.name.replace('.svg', '');
+    document.querySelector('h1').textContent = `Truchet Tile — ${name}`;
+    document.getElementById('info').textContent = `Custom tile: ${file.name}`;
+    render();
+    renderThumbs();
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be re-uploaded
+  e.target.value = '';
+});
+
+// Initialize
+setPattern('random');
+</script>
+</body>
+</html>
