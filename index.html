@@ -322,8 +322,25 @@ function setPattern(name) {
 }
 
 // Event listeners
+
+// Tile thumb click — set entire grid to that rotation
+document.getElementById('tilePreview').addEventListener('click', e => {
+  const thumb = e.target.closest('.tile-thumb');
+  if (!thumb) return;
+  const rot = parseInt(thumb.dataset.rot);
+  currentRotations = Array.from({length: GRID}, () => Array(GRID).fill(rot));
+  render();
+  // Highlight active thumb
+  document.querySelectorAll('.tile-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+  document.getElementById('info').textContent = `All tiles: ${rot * 90}°`;
+});
+
 document.getElementById('controls').addEventListener('click', e => {
-  if (e.target.dataset.pattern) setPattern(e.target.dataset.pattern);
+  if (!e.target.dataset.pattern) return;
+  // Clear active thumb when switching patterns
+  document.querySelectorAll('.tile-thumb').forEach(t => t.classList.remove('active'));
+  setPattern(e.target.dataset.pattern);
 });
 
 document.getElementById('fillColor').addEventListener('input', e => {
