@@ -3,138 +3,246 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Truchet Tile Variations — P1</title>
+<title>Truchet Tile Variations â Studio Luminant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f0eb;
-    --fg: #1a1a1a;
-    --accent: #c8a96e;
-    --panel-bg: #ffffff;
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-dim: #8A6E2F;
+    --obsidian: #0C0C0E;
+    --deep: #111114;
+    --surface: #18181D;
+    --surface-2: #1F1F26;
+    --border: rgba(201,168,76,0.18);
+    --text-primary: #F0EAD6;
+    --text-secondary: #9A9088;
+    --text-muted: #8A8078;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--fg);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    background: var(--obsidian);
+    color: var(--text-primary);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem 1rem;
+    padding: 2.5rem 1rem;
   }
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+  body > * { position: relative; z-index: 1; }
+
+  .eyebrow {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.65rem; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.8rem;
+  }
+  .eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--gold); }
+
   h1 {
-    font-size: 1.6rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
     font-weight: 300;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0.04em;
     margin-bottom: 0.3rem;
+    color: var(--text-primary);
   }
   .subtitle {
-    font-size: 0.85rem;
-    color: #888;
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.04em;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    letter-spacing: 0.06em;
+    font-weight: 300;
   }
+
+  /* Pattern buttons */
   .controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
     justify-content: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.8rem;
   }
   button {
-    padding: 0.5rem 1.2rem;
-    border: 1px solid #ccc;
-    background: var(--panel-bg);
-    color: var(--fg);
-    font-size: 0.82rem;
-    letter-spacing: 0.03em;
+    font-family: 'Jost', sans-serif;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
+    transition: all 0.3s ease;
+    border-radius: 0;
   }
-  button:hover { border-color: var(--accent); color: var(--accent); }
-  button.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+  button:hover { border-color: var(--gold); color: var(--gold); }
+  button.active {
+    background: var(--gold); color: var(--obsidian);
+    border-color: var(--gold); font-weight: 500;
+  }
 
+  /* Tile selector row */
+  .tile-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .tile-select-wrap > label:first-of-type {
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  #tileLibrary {
+    font-family: 'Jost', sans-serif;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    border-radius: 0;
+    cursor: pointer;
+    min-width: 200px;
+    transition: border-color 0.3s;
+  }
+  #tileLibrary:hover, #tileLibrary:focus { border-color: var(--gold); outline: none; }
+  #tileLibrary optgroup { font-weight: 500; color: var(--text-primary); }
+  #tileLibrary option { font-weight: 300; background: var(--surface); color: var(--text-primary); }
+  #uploadLabel {
+    font-family: 'Jost', sans-serif !important;
+    padding: 0.45rem 0.9rem !important;
+    border: 1px solid var(--border) !important;
+    background: var(--surface) !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.78rem !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    border-radius: 0 !important;
+    transition: all 0.3s ease !important;
+  }
+  #uploadLabel:hover { border-color: var(--gold) !important; color: var(--gold) !important; }
+
+  /* Color controls */
   .color-controls {
     display: flex;
-    gap: 1rem;
+    gap: 1.2rem;
     align-items: center;
-    margin-bottom: 1.5rem;
-    font-size: 0.82rem;
+    margin-bottom: 1.8rem;
+    font-size: 0.78rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
   }
-  .color-controls label { display: flex; align-items: center; gap: 0.4rem; }
+  .color-controls label { display: flex; align-items: center; gap: 0.5rem; }
   .color-controls input[type="color"] {
-    width: 28px; height: 28px; border: 1px solid #ccc; cursor: pointer;
-    padding: 0; background: none;
+    width: 28px; height: 28px; border: 1px solid var(--border); cursor: pointer;
+    padding: 0; background: var(--surface); border-radius: 0;
+  }
+  .color-controls input[type="range"] {
+    accent-color: var(--gold);
   }
 
+  /* Grid container */
   .grid-container {
-    background: var(--panel-bg);
+    background: var(--surface);
     padding: 1.5rem;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 40px rgba(0,0,0,0.3);
     display: inline-block;
     line-height: 0;
   }
   svg#tiling {
     display: block;
     max-width: 90vw;
-    max-height: 75vh;
+    max-height: 72vh;
   }
 
+  /* Tile preview thumbs */
   .tile-preview {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.7rem;
     margin-bottom: 1.5rem;
   }
   .tile-preview-label {
-    font-size: 0.75rem;
-    color: #888;
-    letter-spacing: 0.03em;
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
     text-transform: uppercase;
   }
   .tile-thumb {
     width: 48px;
     height: 48px;
-    border: 2px solid #ddd;
-    border-radius: 3px;
+    border: 1px solid var(--border);
+    border-radius: 0;
     cursor: pointer;
-    background: var(--panel-bg);
+    background: var(--surface-2);
     padding: 4px;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
     position: relative;
   }
-  .tile-thumb:hover { border-color: var(--accent); }
-  .tile-thumb.active { border-color: var(--fg); box-shadow: 0 0 0 1px var(--fg); }
+  .tile-thumb:hover { border-color: var(--gold); }
+  .tile-thumb.active { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
   .tile-thumb svg { width: 100%; height: 100%; display: block; }
   .tile-thumb-deg {
     position: absolute;
-    bottom: -14px;
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.6rem;
-    color: #aaa;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
   }
 
   .info {
-    margin-top: 1rem;
-    font-size: 0.75rem;
-    color: #aaa;
+    margin-top: 1.2rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
     text-align: center;
+    letter-spacing: 0.04em;
   }
 
+  /* SL branding footer */
+  .sl-brand {
+    margin-top: 2.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+  .sl-brand span { color: var(--gold); }
+
   @media (max-width: 600px) {
-    h1 { font-size: 1.2rem; }
-    .controls { gap: 0.35rem; }
-    button { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+    h1 { font-size: 1.5rem; }
+    .controls { gap: 0.3rem; }
+    button { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
+    .tile-select-wrap { flex-wrap: wrap; justify-content: center; }
   }
 </style>
 </head>
 <body>
 
-<h1>Truchet Tile — P1</h1>
-<p class="subtitle" id="subtitle">12 × 12 Tiling Variations</p>
+<div class="eyebrow">Design Tool</div>
+<h1>Truchet Tile â P1</h1>
+<p class="subtitle" id="subtitle">12 Ã 12 Tiling Variations</p>
 
 <div class="controls" id="controls">
   <button data-pattern="random" class="active">Random</button>
@@ -151,21 +259,48 @@
   <button data-pattern="radial">Radial</button>
 </div>
 
+<div class="tile-select-wrap">
+  <label for="tileLibrary">Tile</label>
+  <select id="tileLibrary">
+    <option value="P1" selected>P1 â Original</option>
+    <option value="P2">P2</option>
+    <optgroup label="Organic">
+      <option value="FlowingArcs">Flowing Arcs</option>
+      <option value="LeafVein">Leaf Vein</option>
+      <option value="WaveRibbon">Wave Ribbon</option>
+      <option value="AmoebaSplit">Amoeba Split</option>
+      <option value="CoralBranch">Coral Branch</option>
+      <option value="RiverDelta">River Delta</option>
+    </optgroup>
+    <optgroup label="Geometric">
+      <option value="QuarterCircles">Quarter Circles</option>
+      <option value="DiagonalBand">Diagonal Band</option>
+      <option value="SCurve">S-Curve</option>
+      <option value="Triangles">Triangles</option>
+      <option value="InterlockingArcs">Interlocking Arcs</option>
+      <option value="Labyrinth">Labyrinth</option>
+    </optgroup>
+    <optgroup label="â">
+      <option value="custom" disabled>â Upload your own SVG</option>
+    </optgroup>
+  </select>
+  <label id="uploadLabel" style="padding:0.35rem 0.8rem;border:1px solid #ccc;background:var(--panel-bg);font-size:0.82rem;cursor:pointer;border-radius:2px;transition:all 0.2s">â Upload SVG<input type="file" id="svgUpload" accept=".svg" style="display:none"></label>
+</div>
+
 <div class="tile-preview" id="tilePreview">
   <span class="tile-preview-label">Tile</span>
-  <div class="tile-thumb" data-rot="0" title="0°"><svg id="thumb0" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">0°</span></div>
-  <div class="tile-thumb" data-rot="1" title="90°"><svg id="thumb1" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">90°</span></div>
-  <div class="tile-thumb" data-rot="2" title="180°"><svg id="thumb2" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">180°</span></div>
-  <div class="tile-thumb" data-rot="3" title="270°"><svg id="thumb3" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">270°</span></div>
+  <div class="tile-thumb" data-rot="0" title="0Â°"><svg id="thumb0" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">0Â°</span></div>
+  <div class="tile-thumb" data-rot="1" title="90Â°"><svg id="thumb1" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">90Â°</span></div>
+  <div class="tile-thumb" data-rot="2" title="180Â°"><svg id="thumb2" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">180Â°</span></div>
+  <div class="tile-thumb" data-rot="3" title="270Â°"><svg id="thumb3" xmlns="http://www.w3.org/2000/svg"></svg><span class="tile-thumb-deg">270Â°</span></div>
 </div>
 
 <div class="color-controls">
-  <label>Grid: <input type="range" id="gridSize" min="2" max="32" value="12" style="width:100px;vertical-align:middle"> <span id="gridLabel">12×12</span></label>
-  <label>Fill: <input type="color" id="fillColor" value="#000000"></label>
-  <label>Background: <input type="color" id="bgColor" value="#ffffff"></label>
+  <label>Grid: <input type="range" id="gridSize" min="2" max="32" value="12" style="width:100px;vertical-align:middle"> <span id="gridLabel">12Ã12</span></label>
+  <label>Fill: <input type="color" id="fillColor" value="#C9A84C"></label>
+  <label>Background: <input type="color" id="bgColor" value="#0C0C0E"></label>
   <button id="invertBtn" style="padding:0.35rem 0.8rem">Invert</button>
-  <button id="downloadBtn" style="padding:0.35rem 0.8rem">↓ SVG</button>
-  <label id="uploadLabel" style="padding:0.35rem 0.8rem;border:1px solid #ccc;background:var(--panel-bg);font-size:0.82rem;cursor:pointer;border-radius:2px;transition:all 0.2s">↑ Upload SVG<input type="file" id="svgUpload" accept=".svg" style="display:none"></label>
+  <button id="downloadBtn" style="padding:0.35rem 0.8rem">â SVG</button>
 </div>
 
 <div class="grid-container" id="gridContainer">
@@ -173,6 +308,7 @@
 </div>
 
 <p class="info" id="info">Click "Random" again to regenerate</p>
+<p class="sl-brand"><span>Studio Luminant</span> â Bespoke Architectural Elements</p>
 
 <script>
 let GRID = 12;
@@ -182,10 +318,10 @@ const ORIG = 192.756; // original tile size
 
 let currentPattern = 'random';
 let currentRotations = [];
-let fillColor = '#000000';
-let bgColor = '#ffffff';
+let fillColor = '#C9A84C';
+let bgColor = '#0C0C0E';
 
-// Default tile SVG content (P1 Truchet) — viewBox and inner paths
+// Default tile SVG content (P1 Truchet) â viewBox and inner paths
 let tileViewBox = `0 0 192.756 192.756`;
 let tileInnerSVG = `
   <path d="m 0,0 v 72.115 0.166 h 24.093 c 0,-13.28 10.81,-24.09 24.1,-24.09 V 24.284 24.091 c -13.29,0 -24.1,-10.8 -24.1,-24.09 0,-13.29 10.81,-24.09 24.1,-24.09 v -0.182 -23.807 -0.111 c -12.22,0 -23.38,4.55 -31.87,12.05 -10.01,8.82 -16.32,21.75 -16.32,36.14"
@@ -198,7 +334,79 @@ let tileInnerSVG = `
     style="fill-rule:nonzero;stroke:none"
     transform="matrix(1.3333333,0,0,-1.3333333,64.251333,192.75133)" />`;
 
-// Pattern generators — each returns a 12x12 array of rotations (0, 1, 2, 3 = 0°, 90°, 180°, 270°)
+// âââ Built-in tile library âââ
+const TILE_LIBRARY = {
+  P1: {
+    vb: '0 0 192.756 192.756',
+    svg: `<path d="m 0,0 v 72.115 0.166 h 24.093 c 0,-13.28 10.81,-24.09 24.1,-24.09 V 24.284 24.091 c -13.29,0 -24.1,-10.8 -24.1,-24.09 0,-13.29 10.81,-24.09 24.1,-24.09 v -0.182 -23.807 -0.111 c -12.22,0 -23.38,4.55 -31.87,12.05 -10.01,8.82 -16.32,21.75 -16.32,36.14" style="fill-rule:nonzero;stroke:none" transform="matrix(1.3333333,0,0,-1.3333333,128.50053,96.379333)"/><path d="m 0,0 v 72.115 0.166 h -24.093 c 0,-13.28 -10.81,-24.09 -24.1,-24.09 V 24.284 24.091 c 13.29,0 24.1,-10.8 24.1,-24.09 0,-13.29 -10.81,-24.09 -24.1,-24.09 v -0.182 -23.807 -0.111 c 12.22,0 23.38,4.55 31.87,12.05 10.01,8.82 16.32,21.75 16.32,36.14" style="fill-rule:nonzero;stroke:none" transform="matrix(1.3333333,0,0,-1.3333333,64.255467,96.379333)"/><path d="m 0,0 c 0,13.28 10.81,24.09 24.09,24.09 13.29,0 24.1,-10.81 24.1,-24.09 h 24.09 c 0,12.22 -4.55,23.38 -12.04,31.87 C 51.4,41.87 38.49,48.18 24.09,48.18 9.7,48.18 -3.22,41.87 -12.05,31.87 -19.55,23.38 -24.1,12.22 -24.1,0 Z" style="fill-rule:nonzero;stroke:none" transform="matrix(1.3333333,0,0,-1.3333333,64.251333,192.75133)"/>`
+  },
+  P2: {
+    vb: '0 0 141.732 141.732',
+    svg: `<path transform="matrix(1,0,0,-1,139.7639,56.649293)" d="M0 0C.642-.005 1.309-.023 1.966-.044V28.301C-13.689 28.301-26.379 40.996-26.379 56.651H-54.724C-54.724 56.651-54.699 55.956-54.689 54.786V54.741C-54.669 52.436-54.704 48.331-55.064 44.091-55.064 44.086-55.064 44.076-55.069 44.066-55.524 38.686-56.689 33.096-57.274 30.691-58.549 25.411-61.829 15.271-61.829 15.271-63.024 11.731-64.309 8.361-65.664 5.151-70.454-6.199-76.074-15.544-81.274-23.409-85.324-29.534-89.114-34.764-92.049-39.339-94.224-42.729-95.904-45.344-97.299-47.574-100.874-53.314-102.514-56.519-105.714-63.839-109.939-73.504-111.154-79.259-111.109-84.299-111.114-84.564-111.109-84.824-111.099-85.084L-83.074-85.009C-83.074-67.679-77.859-51.539-68.924-38.084-62.639-28.619-54.509-20.479-45.049-14.179-32.141-5.582-16.762-.418-.224 0Z" fill="black"/><path transform="matrix(1,0,0,-1,141.7298,85.03839)" d="M0 0C-.72 0-.984 .03-1.607 .03H-2.36C-32.61-1.12-56.69-26.095-56.69-56.62L-28.347-56.695C-28.347-41.04-15.652-28.35 .003-28.35Z" fill="black"/><path transform="matrix(1,0,0,-1,0,85.0383)" d="M0 0C7.815 0 14.17 6.355 14.17 14.17 14.17 21.985 7.815 28.345 0 28.345V56.69C15.655 56.69 28.345 69.385 28.345 85.04H56.69C56.69 85.04 56.69 67.415 54.685 56.245 52.7 45.175 51.52 34.075 44.435 18.575 44.1 17.84 43.76 17.115 43.425 16.4 42.405 14.235 41.385 12.17 40.37 10.21 36.585 2.92 32.815-3.025 29.015-8.01 27.08-10.545 25.14-12.835 23.185-14.925 16.093-22.512 5.277-27.219 .156-28.311 .103-28.322 .051-28.333 0-28.344Z" fill="black"/>`
+  },
+  // ââ Organic ââ
+  FlowingArcs: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 50,0 C 50,28 28,50 0,50 L 0,38 C 22,38 38,22 38,0 Z" fill="black"/><path d="M 50,100 C 50,72 72,50 100,50 L 100,62 C 78,62 62,78 62,100 Z" fill="black"/>`
+  },
+  LeafVein: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 0,42 C 30,42 25,15 50,15 C 75,15 70,42 100,42 L 100,58 C 70,58 75,85 50,85 C 25,85 30,58 0,58 Z" fill="black"/><path d="M 44,15 C 44,8 46,0 50,0 L 50,0 C 54,0 56,8 56,15" fill="black"/><path d="M 44,85 C 44,92 46,100 50,100 L 50,100 C 54,100 56,92 56,85" fill="black"/>`
+  },
+  WaveRibbon: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 35,0 C 35,20 10,25 10,50 C 10,75 35,80 35,100 L 65,100 C 65,80 90,75 90,50 C 90,25 65,20 65,0 Z" fill="black"/>`
+  },
+  AmoebaSplit: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 50,0 C 40,5 35,12 30,22 C 24,34 15,38 0,50 L 0,0 Z" fill="black"/><path d="M 50,100 C 60,95 65,88 70,78 C 76,66 85,62 100,50 L 100,100 Z" fill="black"/><ellipse cx="50" cy="50" rx="8" ry="10" transform="rotate(-30 50 50)" fill="black"/>`
+  },
+  CoralBranch: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 0,42 C 15,40 25,35 40,38 C 50,40 55,45 60,42 C 70,38 85,40 100,42 L 100,58 C 85,60 70,62 60,58 C 55,55 50,60 40,62 C 25,65 15,60 0,58 Z" fill="black"/><path d="M 38,38 C 32,28 35,15 42,0 L 58,0 C 50,15 48,28 44,38" fill="black"/><path d="M 62,58 C 68,72 65,85 58,100 L 42,100 C 50,85 52,72 56,62" fill="black"/>`
+  },
+  RiverDelta: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 0,40 C 20,40 30,30 50,35 C 65,38 70,50 70,65 C 70,80 65,90 58,100 L 42,100 C 50,90 55,80 55,65 C 55,50 50,42 38,40 C 28,38 20,45 0,48 Z" fill="black"/><path d="M 55,38 C 65,32 75,30 85,32 C 92,34 96,38 100,42 L 100,55 C 95,50 88,46 80,45 C 72,44 65,46 58,48" fill="black"/><path d="M 42,0 C 42,10 38,20 35,30 L 28,26 C 32,18 34,10 35,0 Z" fill="black"/>`
+  },
+  // ââ Geometric ââ
+  QuarterCircles: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 50,0 A 50,50 0 0,1 0,50 L 0,0 Z" fill="black"/><path d="M 50,100 A 50,50 0 0,1 100,50 L 100,100 Z" fill="black"/>`
+  },
+  DiagonalBand: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><polygon points="50,0 100,0 100,50 50,100 0,100 0,50" fill="black"/>`
+  },
+  SCurve: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 0,35 C 25,35 25,0 50,0 L 50,0 C 75,0 75,35 100,35 L 100,65 C 75,65 75,100 50,100 L 50,100 C 25,100 25,65 0,65 Z" fill="black"/>`
+  },
+  Triangles: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><polygon points="50,0 0,0 0,50" fill="black"/><polygon points="50,100 100,100 100,50" fill="black"/><polygon points="50,35 65,50 50,65 35,50" fill="black"/>`
+  },
+  InterlockingArcs: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 36,0 A 36,36 0 0,1 0,36 L 0,24 A 24,24 0 0,0 24,0 Z" fill="black"/><path d="M 76,0 A 76,76 0 0,1 0,76 L 0,58 A 58,58 0 0,0 58,0 Z" fill="black"/><path d="M 64,100 A 36,36 0 0,1 100,64 L 100,76 A 24,24 0 0,0 76,100 Z" fill="black"/><path d="M 24,100 A 76,76 0 0,1 100,24 L 100,42 A 58,58 0 0,0 42,100 Z" fill="black"/>`
+  },
+  Labyrinth: {
+    vb: '0 0 100 100',
+    svg: `<rect width="100" height="100" fill="white"/><path d="M 42,0 L 42,42 L 100,42 L 100,58 L 58,58 L 58,0 Z" fill="black"/><path d="M 0,42 L 17,42 L 17,100 L 33,100 L 33,58 L 0,58 Z" fill="black"/>`
+  }
+};
+
+function loadTile(key) {
+  const tile = TILE_LIBRARY[key];
+  if (!tile) return;
+  tileViewBox = tile.vb;
+  tileInnerSVG = tile.svg;
+  document.querySelector('h1').textContent = `Truchet Tile â ${key}`;
+  render();
+  renderThumbs();
+}
+
+// Pattern generators â each returns a 12x12 array of rotations (0, 1, 2, 3 = 0Â°, 90Â°, 180Â°, 270Â°)
 const patterns = {
   random: () => Array.from({length: GRID}, () => Array.from({length: GRID}, () => Math.floor(Math.random() * 4))),
 
@@ -262,7 +470,7 @@ const patterns = {
 };
 
 function renderThumbs() {
-  // Render all thumbs at 0° with clipping, then CSS-rotate the whole element.
+  // Render all thumbs at 0Â° with clipping, then CSS-rotate the whole element.
   // This ensures the tile is clipped to its boundary first, then rotated as a unit
   // (matching how the grid renders via <symbol overflow="hidden"> + <use transform>).
   for (let i = 0; i < 4; i++) {
@@ -282,7 +490,7 @@ function render() {
   svg.setAttribute('height', totalSize);
   svg.setAttribute('viewBox', `0 0 ${totalSize} ${totalSize}`);
 
-  // Use a <symbol> with the original viewBox — the browser handles scaling via width/height on <use>
+  // Use a <symbol> with the original viewBox â the browser handles scaling via width/height on <use>
   // Add a clipPath inside the symbol to clip to tile boundary (replacing the original clip-paths)
   let html = `<rect width="${totalSize}" height="${totalSize}" fill="${bgColor}"/>`;
   html += `<defs>
@@ -323,7 +531,7 @@ function setPattern(name) {
 
 // Event listeners
 
-// Tile thumb click — set entire grid to that rotation
+// Tile thumb click â set entire grid to that rotation
 document.getElementById('tilePreview').addEventListener('click', e => {
   const thumb = e.target.closest('.tile-thumb');
   if (!thumb) return;
@@ -333,7 +541,7 @@ document.getElementById('tilePreview').addEventListener('click', e => {
   // Highlight active thumb
   document.querySelectorAll('.tile-thumb').forEach(t => t.classList.remove('active'));
   thumb.classList.add('active');
-  document.getElementById('info').textContent = `All tiles: ${rot * 90}°`;
+  document.getElementById('info').textContent = `All tiles: ${rot * 90}Â°`;
 });
 
 document.getElementById('controls').addEventListener('click', e => {
@@ -368,8 +576,8 @@ document.getElementById('invertBtn').addEventListener('click', () => {
 
 document.getElementById('gridSize').addEventListener('input', e => {
   GRID = parseInt(e.target.value);
-  document.getElementById('gridLabel').textContent = `${GRID}×${GRID}`;
-  document.getElementById('subtitle').textContent = `${GRID} × ${GRID} Tiling Variations`;
+  document.getElementById('gridLabel').textContent = `${GRID}Ã${GRID}`;
+  document.getElementById('subtitle').textContent = `${GRID} Ã ${GRID} Tiling Variations`;
   setPattern(currentPattern);
 });
 
@@ -382,9 +590,18 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `truchet_P1_${currentPattern}_${GRID}x${GRID}.svg`;
+  const tileName = document.getElementById('tileLibrary').value || 'custom';
+  a.download = `truchet_${tileName}_${currentPattern}_${GRID}x${GRID}.svg`;
   a.click();
   URL.revokeObjectURL(url);
+});
+
+// Tile library dropdown
+document.getElementById('tileLibrary').addEventListener('change', e => {
+  const key = e.target.value;
+  if (key === 'custom') return;
+  loadTile(key);
+  setPattern(currentPattern);
 });
 
 document.getElementById('svgUpload').addEventListener('change', e => {
@@ -418,10 +635,22 @@ document.getElementById('svgUpload').addEventListener('change', e => {
     }
     tileInnerSVG = inner;
 
-    // Update title
+    // Update title and dropdown
     const name = file.name.replace('.svg', '');
-    document.querySelector('h1').textContent = `Truchet Tile — ${name}`;
+    document.querySelector('h1').textContent = `Truchet Tile â ${name}`;
     document.getElementById('info').textContent = `Custom tile: ${file.name}`;
+
+    // Add/update custom option in dropdown
+    const sel = document.getElementById('tileLibrary');
+    let customOpt = sel.querySelector('option[value="uploaded"]');
+    if (!customOpt) {
+      customOpt = document.createElement('option');
+      customOpt.value = 'uploaded';
+      sel.insertBefore(customOpt, sel.querySelector('optgroup'));
+    }
+    customOpt.textContent = `â ${name}`;
+    sel.value = 'uploaded';
+
     render();
     renderThumbs();
   };
